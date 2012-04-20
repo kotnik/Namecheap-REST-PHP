@@ -29,7 +29,7 @@ $nc_api = array(
 
 $sandbox = TRUE; // Use the Namecheap sandbox to test
 
-$nc = Namecheap::get($nc_api, $sandbox);
+$nc = Namecheap::init($nc_api, $sandbox);
 
 if ($nc) {
   if ($nc->domainsCheck('example.com')) {
