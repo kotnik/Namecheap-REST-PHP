@@ -1,25 +1,25 @@
-#Namecheap-REST-PHP
+## Namecheap-REST-PHP
 
 Simple PHP library for using the Namecheap REST API.
 
 API documentation: http://developer.namecheap.com/docs/doku.php?id=api-reference:index.
 
-## About
+### About
 
 This is a simple single-file class for accessing the Namecheap REST API.
 
 Methods are loosely named after the corresponding API endpoint.
 
-namecheap.domains.check         == domainsCheck()
-namecheap.domains.create        == domainsCreate()
-namecheap.domains.ns.create     == nsCreate()
-namecheap.domains.dns.setCustom == dnsSetCustom()
+  namecheap.domains.check         == domainsCheck()
+  namecheap.domains.create        == domainsCreate()
+  namecheap.domains.ns.create     == nsCreate()
+  namecheap.domains.dns.setCustom == dnsSetCustom()
 
 The class fully supports the Namecheap Sandbox (https://www.sandbox.namecheap.com) during object construction.
 
 The raw response from the Namecheap API is available as a public variable "$Raw". Any call the results in an error stores the full error in a public variable "$Error".
 
-## Usage
+### Usage
 
 ```php
 include_once( 'namecheap.php' );
@@ -50,7 +50,7 @@ if ( ! $nc->domainCreate( 'example.com', $registration_data ) ) {
 }
 ```
 
-## License
+### License
 
 Copyright 2011 Scott Merrill
 
