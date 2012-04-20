@@ -20,31 +20,37 @@ The raw response from the Namecheap API is available as a public variable "$Raw"
 ### Usage
 
 ```php
-include_once( 'namecheap.php' );
+include_once('namecheap.php');
 $nc_api = array(
   'api_user' => 'username',
   'api_key' => 'some_key',
   'api_ip' => 'detect'
 );
-$sandbox = 'true'; // use the Namecheap sandbox to test
-$nc = new Namecheap( $nc_api, $sandbox );
-if ( $nc->domainsCheck( 'example.com' ) ) {
-	echo "<p>example.com is available!</p>";
-}
-$domains = array( 'example.net', 'example.org', 'example.info' );
-$results = $nc->domainsCheck( $domains );
-echo "<ul>";
-foreach ( $results as $domain => $available ) {
-	$status = ( $available ) ? 'available' : 'not available';
-	echo "<li>$domain: $status</li>";
-}
-echo "</ul>";
 
-// registering a domain requires an awful lof of mandatory data:
-// http://developer.namecheap.com/docs/doku.php?id=api-reference:domains:create
-// stick all that in an associative array
-if ( ! $nc->domainCreate( 'example.com', $registration_data ) ) {
-	print_r( $nc->Error );
+$sandbox = TRUE; // Use the Namecheap sandbox to test
+
+$nc = Namecheap::get($nc_api, $sandbox);
+
+if ($nc) {
+  if ($nc->domainsCheck('example.com')) {
+    echo "<p>example.com is available!</p>";
+  }
+
+  $domains = array('example.net', 'example.org', 'example.info');
+  $results = $nc->domainsCheck($domains);
+  echo "<ul>";
+  foreach ($results as $domain => $available) {
+    $status = ($available) ? 'available' : 'not available';
+    echo "<li>$domain: $status</li>";
+  }
+  echo "</ul>";
+
+  // registering a domain requires an awful lof of mandatory data:
+  // http://developer.namecheap.com/docs/doku.php?id=api-reference:domains:create
+  // stick all that in an associative array
+  if (!$nc->domainCreate('example.com', $registration_data)) {
+    print_r($nc->Error);
+  }
 }
 ```
 
