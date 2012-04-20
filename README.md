@@ -1,5 +1,3 @@
-## Namecheap-REST-PHP
-
 Simple PHP library for using the Namecheap REST API.
 
 API documentation: http://developer.namecheap.com/docs/doku.php?id=api-reference:index.
