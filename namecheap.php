@@ -1,6 +1,9 @@
 <?php
-// Namecheap API class
 
+// Exceptions
+class Namecheap_Exception extends Exception {}
+
+// Namecheap API class
 class Namecheap
 {
   // API credential information required to execute requests
@@ -14,6 +17,23 @@ class Namecheap
   public $Raw;
 
   /**
+   * Factory method.
+   *
+   * @credentials array
+   *   Associative array of namecheap API credentials.
+   * @sandbox boolean
+   *   Whether to use the Namecheap Sandbox or the real site.
+   * @return Namecheap object
+   */
+  public static function get($credentials, $sandbox = TRUE) {
+    try {
+      return new Namecheap($credentials, $sandbox);
+    } catch (Namecheap_Exception $e) {
+      return null;
+    }
+  }
+
+  /**
    * Instantiate a namecheap object.
    *
    * @credentials array
@@ -21,12 +41,16 @@ class Namecheap
    * @sandbox boolean
    *   Whether to use the Namecheap Sandbox or the real site.
    */
-  public function __construct($credentials, $sandbox = true) {
+  public function __construct($credentials, $sandbox = TRUE) {
     if ($sandbox) {
       $this->api_url = 'https://api.sandbox.namecheap.com/xml.response';
     } else {
       $this->api_url = 'https://api.namecheap.com/xml.response';
     }
+    if (empty($credentials)) {
+      throw new Namecheap_Exception();
+    }
+
     $this->api_user = $credentials['api_user'];
     $this->api_key = $credentials['api_key'];
     $this->api_ip = ('detect' == $credentials['api_ip']) ? $this->detect_ip() : $credentials['api_ip'];
