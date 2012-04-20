@@ -25,7 +25,7 @@ class Namecheap
    *   Whether to use the Namecheap Sandbox or the real site.
    * @return Namecheap object
    */
-  public static function get($credentials, $sandbox = TRUE) {
+  public static function init($credentials, $sandbox = TRUE) {
     try {
       return new Namecheap($credentials, $sandbox);
     } catch (Namecheap_Exception $e) {
