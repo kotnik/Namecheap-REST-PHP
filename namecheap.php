@@ -1,7 +1,7 @@
 <?php
 // Namecheap API class
 
-class namecheap
+class Namecheap
 {
 	// API credential information required to execute requests
 	private $api_url;
@@ -41,7 +41,7 @@ class namecheap
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
 		$result = curl_exec( $ch );
 		curl_close( $ch );
-		return $result;
+		return trim($result);
 	}
 
 	/*
