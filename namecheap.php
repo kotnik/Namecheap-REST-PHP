@@ -8,7 +8,7 @@ class Namecheap
   private $api_user;
   private $api_key;
   private $api_ip;
-  // sotrage for API responses
+  // Storage for API responses
   public $Response;
   public $Error;
   public $Raw;
