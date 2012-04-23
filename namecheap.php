@@ -243,8 +243,8 @@ class Namecheap
       return FALSE;
     }
     if ('true' == strtolower($this->Response->DomainDNSSetCustomResult->attributes()->Updated)) {
-        return TRUE;
-      }
+      return TRUE;
+    }
     return FALSE;
   }
 
