@@ -94,12 +94,12 @@ class Namecheap
       '&Command=' . $command;
     foreach ($args as $arg => $value) {
       $url .= "&$arg=";
-      $url .= urlencode( $value );
+      $url .= urlencode($value);
     }
-    $ch = curl_init( $url );
-    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
-    $result = curl_exec( $ch );
-    curl_close( $ch );
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    $result = curl_exec($ch);
+    curl_close($ch);
     if (FALSE == $result) {
       $this->Error = 'Communication error with Namecheap.';
       return FALSE;
@@ -186,7 +186,7 @@ class Namecheap
    * @return mixed
    *   An array of domains or boolean false.
    */
-  public function domainsGetList( $type = 'all', $page = 1, $pagesize = 100,  $sort = 'NAME', $search = '') {
+  public function domainsGetList($type = 'all', $page = 1, $pagesize = 100,  $sort = 'NAME', $search = '') {
     if (!$this->execute('namecheap.domains.getList', array('ListType' => $type, 'SearchTerm' => $search, 'Page' => $page, 'PageSize' => $pagesize, 'SortBy' => $sort))) {
       return FALSE;
     }
@@ -236,7 +236,7 @@ class Namecheap
    *   Success or failure.
    */
   public function dnsSetCustom($domain, $nameservers) {
-    if (is_array( $nameservers)) {
+    if (is_array($nameservers)) {
       $nameservers = implode(',', $nameservers);
     }
     list($sld, $tld) = explode('.', $domain);
@@ -262,7 +262,7 @@ class Namecheap
    */
   public function dnsSetDefault($domain) {
     list($sld, $tld) = explode('.', $domain);
-    if (!$this->execute( 'namecheap.domains.dns.SetDefault', array( 'SLD' => $sld, 'TLD' => $tld ))) {
+    if (!$this->execute('namecheap.domains.dns.SetDefault', array('SLD' => $sld, 'TLD' => $tld))) {
       return FALSE;
     }
     if ('true' == strtolower($this->Response->DomainDNSSetDefaultResult->attributes()->Updated)) {
