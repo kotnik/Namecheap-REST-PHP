@@ -214,9 +214,7 @@ class Namecheap
    *   Success or failure.
    */
   public function nsCreate($domain, $nameserver, $ip) {
-    list($sld, $tld) = explode('.', $domain);
-    $args['SLD'] = $sld;
-    $args['TLD'] = $tld;
+    $args = _explodeDomain($domain);
     $args['Nameserver'] = $nameserver;
     $args['IP'] = $ip;
     if ($this->execute('namecheap.domains.ns.create', $args)) {
@@ -239,9 +237,7 @@ class Namecheap
     if (is_array($nameservers)) {
       $nameservers = implode(',', $nameservers);
     }
-    list($sld, $tld) = explode('.', $domain);
-    $args['SLD'] = $sld;
-    $args['TLD'] = $tld;
+    $args = _explodeDomain($domain);
     $args['NameServers'] = $nameservers;
     if (!$this->execute('namecheap.domains.dns.setCustom', $args)) {
       return FALSE;
@@ -261,8 +257,7 @@ class Namecheap
    *   Success or failure.
    */
   public function dnsSetDefault($domain) {
-    list($sld, $tld) = explode('.', $domain);
-    if (!$this->execute('namecheap.domains.dns.SetDefault', array('SLD' => $sld, 'TLD' => $tld))) {
+    if (!$this->execute('namecheap.domains.dns.SetDefault', _explodeDomain($domain))) {
       return FALSE;
     }
     if ('true' == strtolower($this->Response->DomainDNSSetDefaultResult->attributes()->Updated)) {
@@ -280,8 +275,7 @@ class Namecheap
    *   An array of nameservers, or boolean false.
    */
   public function dnsGetList($domain) {
-    list($sld, $tld) = explode('.', $domain);
-    if (!$this->execute('namecheap.domains.dns.getList', array('SLD' => $sld, 'TLD' => $tld))) {
+    if (!$this->execute('namecheap.domains.dns.getList', _explodeDomain($domain))) {
       return FALSE;
     }
     $servers = array();
@@ -302,8 +296,7 @@ class Namecheap
    *   Success or failure.
    */
   public function dnsSetHosts($domain, $data) {
-    list($data['SLD'], $data['TLD']) = explode('.', $domain);
-    if (!$this->execute('namecheap.domains.dns.setHosts', $data)) {
+    if (!$this->execute('namecheap.domains.dns.setHosts', _explodeDomain($domain))) {
       return FALSE;
     }
     if ('true' == strtolower($this->Response->DomainDNSSetHostsResult->attributes()->IsSuccess)) {
@@ -349,5 +342,19 @@ class Namecheap
       $args['PromotionCode'] = $promo;
     }
     $this->execute('namecheap.users.getPricing', $args);
+  }
+
+  /**
+   * Extract domain SLD and TLD.
+   *
+   * @domain string
+   *   Domain name.
+   * @return array
+   *   An array with SLD and TLD of domain.
+   */
+  private function _explodeDomain($domain) {
+    $data = array();
+    list($data['SLD'], $data['TLD']) = explode('.', $domain);
+    return $data;
   }
 }
