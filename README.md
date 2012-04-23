@@ -8,10 +8,10 @@ This is a simple single-file class for accessing the Namecheap REST API.
 
 Methods are loosely named after the corresponding API endpoint.
 
-  namecheap.domains.check         == domainsCheck()
-  namecheap.domains.create        == domainsCreate()
-  namecheap.domains.ns.create     == nsCreate()
-  namecheap.domains.dns.setCustom == dnsSetCustom()
+    namecheap.domains.check         == domainsCheck()
+    namecheap.domains.create        == domainsCreate()
+    namecheap.domains.ns.create     == nsCreate()
+    namecheap.domains.dns.setCustom == dnsSetCustom()
 
 The class fully supports the Namecheap Sandbox (https://www.sandbox.namecheap.com) during object construction.
 
