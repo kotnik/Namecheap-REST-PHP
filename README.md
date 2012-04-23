@@ -45,7 +45,7 @@ if ($nc) {
   }
   echo "</ul>";
 
-  // registering a domain requires an awful lof of mandatory data:
+  // registering a domain requires an awful lot of mandatory data:
   // http://developer.namecheap.com/docs/doku.php?id=api-reference:domains:create
   // stick all that in an associative array
   if (!$nc->domainCreate('example.com', $registration_data)) {
