@@ -47,13 +47,18 @@ class Namecheap
     } else {
       $this->api_url = 'https://api.namecheap.com/xml.response';
     }
+
     if (empty($credentials)) {
       throw new Namecheap_Exception();
     }
 
-    $this->api_user = $credentials['api_user'];
-    $this->api_key = $credentials['api_key'];
+    $this->api_user = isset($credentials['api_user']) && !empty($credentials['api_user']) ? $credentials['api_user'] : FALSE;
+    $this->api_key = isset($credentials['api_key']) && !empty($credentials['api_key']) ? $credentials['api_key'] : FALSE;
     $this->api_ip = ('detect' == $credentials['api_ip']) ? $this->detect_ip() : $credentials['api_ip'];
+
+    if (!$this->api_user || !$this->api_key) {
+      throw new Namecheap_Exception();
+    }
   }
 
   /**
