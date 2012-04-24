@@ -11,6 +11,8 @@ class Namecheap
   private $api_user;
   private $api_key;
   private $api_ip;
+  // Time measurement
+  private $realTime;
   // Storage for API responses
   public $Response;
   public $Error;
@@ -352,6 +354,23 @@ class Namecheap
   }
 
   /**
+   * API call execution time.
+   *
+   * @return float
+   *   Time needed for API call.
+   */
+  function getExecutionTime() {
+    $x = array(
+      'ExecutionTime' => 0.0,
+      'RealTime' => (float) sprintf('%.3f', $this->realTime),
+    );
+    if (isset($this->Raw->ExecutionTime)) {
+        $x['ExecutionTime'] = (float) $this->Raw->ExecutionTime;
+    }
+    return $x;
+  }
+
+  /**
    * Execute a call to the Namecheap API.
    *
    * @command string
@@ -366,6 +385,8 @@ class Namecheap
     $this->Error = '';
     $this->Response = '';
     $this->Raw = '';
+    $this->realTime = 0.0;
+    $startTime = microtime(TRUE);
 
     $url = $this->api_url .
       '?ApiUser=' . $this->api_user .
@@ -387,6 +408,7 @@ class Namecheap
     }
     $xml = new SimpleXMLElement($result);
     $this->Raw = $xml;
+    $this->realTime =  microtime(TRUE) - $startTime;
     if ('ERROR' == $xml['Status']) {
       $this->Error = (string) $xml->Errors->Error;
       return FALSE;
