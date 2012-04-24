@@ -217,7 +217,7 @@ class Namecheap
     if ($this->execute('namecheap.domains.ns.create', $args)) {
       return TRUE;
     }
-    return $false;
+    return FALSE;
   }
 
   /**
