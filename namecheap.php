@@ -160,6 +160,45 @@ class Namecheap
   }
 
   /**
+   * Renew expiring domain.
+   *
+   * @domain string
+   *   Domain name.
+   * @years int
+   *   Renew time in years. Maximum for 2 years.
+   * @promo string
+   *   Promotion (coupon) code, if available.
+   * @return
+   *   Success or failure.
+   */
+  public function domainsRenew($domain, $years = 1, $promo = '') {
+    $args = array('DomainName' => $domain);
+    if(!empty($promo)) {
+      $args['PromotionCode'] = $promo;
+    }
+    if (!$this->execute('namecheap.domains.renew', $args)) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * Reactivate expired domain.
+   *
+   * @domain string
+   *   Domain name.
+   * @return bool
+   *   Success or failure.
+   */
+  public function domainsReactivate($domain) {
+    if (!$this->execute('namecheap.domains.reactivate', array('DomainName' => $domain))) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
    * Create new nameservers.
    *
    * @domain string
