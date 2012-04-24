@@ -58,64 +58,6 @@ class Namecheap
   }
 
   /**
-   * Determine our IP address.
-   *
-   * @return string our public IP address, as seen by icanhazip.com.
-   */
-  public function detect_ip() {
-    $ch = curl_init('http://icanhazip.com');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    $result = curl_exec($ch);
-    curl_close($ch);
-    return trim($result);
-  }
-
-  /**
-   * Execute a call to the Namecheap API.
-   *
-   * @command string
-   *   The name of the API call to invoke.
-   * @args array
-   *   Associative array of options for the API call.
-   * @return bool
-   *   Success or failure.
-   */
-  private function execute($command, $args = array()) {
-    // blank out any previous values for these
-    $this->Error = '';
-    $this->Response = '';
-    $this->Raw = '';
-
-    $url = $this->api_url .
-      '?ApiUser=' . $this->api_user .
-      '&ApiKey=' . $this->api_key .
-      '&UserName=' . $this->api_user .
-      '&ClientIP=' . $this->api_ip .
-      '&Command=' . $command;
-    foreach ($args as $arg => $value) {
-      $url .= "&$arg=";
-      $url .= urlencode($value);
-    }
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    $result = curl_exec($ch);
-    curl_close($ch);
-    if (FALSE == $result) {
-      $this->Error = 'Communication error with Namecheap.';
-      return FALSE;
-    }
-    $xml = new SimpleXMLElement($result);
-    $this->Raw = $xml;
-    if ('ERROR' == $xml['Status']) {
-      $this->Error = (string) $xml->Errors->Error;
-      return FALSE;
-    } elseif ('OK' == $xml['Status']) {
-      $this->Response = $xml->CommandResponse;
-      return TRUE;
-    }
-  }
-
-  /**
    * Check the availability of one or more domains.
    *
    * @domains mixed array
@@ -230,7 +172,7 @@ class Namecheap
    *   Success or failure.
    */
   public function nsCreate($domain, $nameserver, $ip) {
-    $args = _explodeDomain($domain);
+    $args = explodeDomain($domain);
     $args['Nameserver'] = $nameserver;
     $args['IP'] = $ip;
     if ($this->execute('namecheap.domains.ns.create', $args)) {
@@ -253,7 +195,7 @@ class Namecheap
     if (is_array($nameservers)) {
       $nameservers = implode(',', $nameservers);
     }
-    $args = _explodeDomain($domain);
+    $args = explodeDomain($domain);
     $args['NameServers'] = $nameservers;
     if (!$this->execute('namecheap.domains.dns.setCustom', $args)) {
       return FALSE;
@@ -273,7 +215,7 @@ class Namecheap
    *   Success or failure.
    */
   public function dnsSetDefault($domain) {
-    if (!$this->execute('namecheap.domains.dns.SetDefault', _explodeDomain($domain))) {
+    if (!$this->execute('namecheap.domains.dns.SetDefault', explodeDomain($domain))) {
       return FALSE;
     }
     if ('true' == strtolower($this->Response->DomainDNSSetDefaultResult->attributes()->Updated)) {
@@ -291,7 +233,7 @@ class Namecheap
    *   An array of nameservers, or boolean false.
    */
   public function dnsGetList($domain) {
-    if (!$this->execute('namecheap.domains.dns.getList', _explodeDomain($domain))) {
+    if (!$this->execute('namecheap.domains.dns.getList', explodeDomain($domain))) {
       return FALSE;
     }
     $servers = array();
@@ -312,7 +254,7 @@ class Namecheap
    *   Success or failure.
    */
   public function dnsSetHosts($domain, $data) {
-    if (!$this->execute('namecheap.domains.dns.setHosts', _explodeDomain($domain))) {
+    if (!$this->execute('namecheap.domains.dns.setHosts', explodeDomain($domain))) {
       return FALSE;
     }
     if ('true' == strtolower($this->Response->DomainDNSSetHostsResult->attributes()->IsSuccess)) {
@@ -361,6 +303,64 @@ class Namecheap
   }
 
   /**
+   * Execute a call to the Namecheap API.
+   *
+   * @command string
+   *   The name of the API call to invoke.
+   * @args array
+   *   Associative array of options for the API call.
+   * @return bool
+   *   Success or failure.
+   */
+  private function execute($command, $args = array()) {
+    // blank out any previous values for these
+    $this->Error = '';
+    $this->Response = '';
+    $this->Raw = '';
+
+    $url = $this->api_url .
+      '?ApiUser=' . $this->api_user .
+      '&ApiKey=' . $this->api_key .
+      '&UserName=' . $this->api_user .
+      '&ClientIP=' . $this->api_ip .
+      '&Command=' . $command;
+    foreach ($args as $arg => $value) {
+      $url .= "&$arg=";
+      $url .= urlencode($value);
+    }
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    $result = curl_exec($ch);
+    curl_close($ch);
+    if (FALSE == $result) {
+      $this->Error = 'Communication error with Namecheap.';
+      return FALSE;
+    }
+    $xml = new SimpleXMLElement($result);
+    $this->Raw = $xml;
+    if ('ERROR' == $xml['Status']) {
+      $this->Error = (string) $xml->Errors->Error;
+      return FALSE;
+    } elseif ('OK' == $xml['Status']) {
+      $this->Response = $xml->CommandResponse;
+      return TRUE;
+    }
+  }
+
+  /**
+   * Determine our IP address.
+   *
+   * @return string our public IP address, as seen by icanhazip.com.
+   */
+  private function detect_ip() {
+    $ch = curl_init('http://icanhazip.com');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    $result = curl_exec($ch);
+    curl_close($ch);
+    return trim($result);
+  }
+
+  /**
    * Extract domain SLD and TLD.
    *
    * @domain string
@@ -368,7 +368,7 @@ class Namecheap
    * @return array
    *   An array with SLD and TLD of domain.
    */
-  private function _explodeDomain($domain) {
+  private function explodeDomain($domain) {
     $data = array();
     list($data['SLD'], $data['TLD']) = explode('.', $domain);
     return $data;
