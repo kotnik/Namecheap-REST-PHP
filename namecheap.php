@@ -148,6 +148,22 @@ class Namecheap
   }
 
   /**
+   * Return domain information.
+   *
+   * @domain string
+   *   Single domain name to query.
+   * @return array
+   *   Associative array with domain data.
+   */
+  public function domainsGetInfo($domain) {
+    if (!$this->execute('namecheap.domains.getinfo', array('DomainName' => $domain))) {
+      return FALSE;
+    }
+
+    return $this->Response->DomainGetInfoResult;
+  }
+
+  /**
    * Register a domain.
    *
    * @domain string
