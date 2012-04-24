@@ -102,7 +102,17 @@ class Namecheap
       return FALSE;
     }
 
-    return $this->Response->DomainGetInfoResult;
+    $x = array();
+    $attrs = $this->Response->DomainGetInfoResult->attributes();
+    $x['ID'] = (string) $attrs['ID'];
+    $x['DomainName'] = (string) $attrs['DomainName'];
+    $x['User'] = (string) $attrs['OwnerName'];
+    $x['Created'] = (string) $this->Response->DomainGetInfoResult->DomainDetails->CreatedDate;
+    $x['Expires'] = (string) $this->Response->DomainGetInfoResult->DomainDetails->ExpiredDate;
+    $attrs = $this->Response->DomainGetInfoResult->Whoisguard->attributes();
+    $x['WhoisGuard'] = (string) $attrs['Enabled'];
+
+    return $x;
   }
 
   /**
