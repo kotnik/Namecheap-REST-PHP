@@ -39,7 +39,7 @@ if ($domain == 'random') {
   }
   $domain .= '.com';
 }
-echo "Working with $domain.\t\t\t\t(v = 0.000s)\n";
+echo "Working with $domain.\t\t\t\t(t = 0.000s)\n";
 
 // Check if the domain is already registered
 if (!$namecheap->domainsCheck($domain)) {
@@ -48,7 +48,7 @@ if (!$namecheap->domainsCheck($domain)) {
 } else {
   $time = $namecheap->getExecutionTime();
   echo "$domain is available.\t\t\t\t";
-  echo "(v = " . $time['RealTime'] . "s)\n";
+  echo "(t = " . $time['RealTime'] . "s)\n";
 }
 
 // Register domain
@@ -102,14 +102,14 @@ if (!$namecheap->domainsCreate($domain, $domain_reg_data)) {
 } else {
   $time = $namecheap->getExecutionTime();
   echo "$domain registered.\t\t\t\t";
-  echo "(v = " . $time['RealTime'] . "s)\n";
+  echo "(t = " . $time['RealTime'] . "s)\n";
 }
 
 // Get domain info
 if ($domain_info = $namecheap->domainsGetInfo($domain)) {
   $time = $namecheap->getExecutionTime();
   echo "$domain " . ($argv[0] == $domain_info['User'] ? 'is' : 'is *not*') . " owned by us.\t\t\t\t";
-  echo "(v = " . $time['RealTime'] . "s)\n";
+  echo "(t = " . $time['RealTime'] . "s)\n";
 } else {
   file_put_contents('php://stderr', "$domain info query failed.\n");
   exit(1);
@@ -133,13 +133,13 @@ if ($expiry_timestamp > time()) {
   if ($days_left < $days_renew) {
     if ($namecheap->domainsRenew($domain)) {
       echo "$domain renewed.\t\t\t\t";
-      echo "(v = " . $time['RealTime'] . "s)\n";
+      echo "(t = " . $time['RealTime'] . "s)\n";
     } else {
       file_put_contents('php://stderr', "$domain renewal failed.\n");
       exit(1);
     }
   } else {
     echo "$domain expires in $days_left days.\t\t\t";
-    echo "(v = " . $time['RealTime'] . "s)\n";
+    echo "(t = " . $time['RealTime'] . "s)\n";
   }
 }
