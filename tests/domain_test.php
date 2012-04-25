@@ -43,7 +43,11 @@ echo "Working with $domain.\t\t\t\t(t = 0.000s)\n";
 
 // Check if the domain is already registered
 if (!$namecheap->domainsCheck($domain)) {
-  file_put_contents('php://stderr', "$domain is already taken.\n");
+  if ($namecheap->errorCode == -1) {
+    file_put_contents('php://stderr', "Namecheap API down.\n");
+  } else {
+    file_put_contents('php://stderr', "$domain is already taken.\n");
+  }
   exit(1);
 } else {
   $time = $namecheap->getExecutionTime();

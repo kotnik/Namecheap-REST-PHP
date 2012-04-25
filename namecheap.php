@@ -16,6 +16,7 @@ class Namecheap
   // Storage for API responses
   public $Response;
   public $Error;
+  public $errorCode;
   public $Raw;
 
   /**
@@ -383,6 +384,7 @@ class Namecheap
   private function execute($command, $args = array()) {
     // blank out any previous values for these
     $this->Error = '';
+    $this->errorCode = 0;
     $this->Response = '';
     $this->Raw = '';
     $this->realTime = 0.0;
@@ -404,6 +406,7 @@ class Namecheap
     curl_close($ch);
     if (FALSE == $result) {
       $this->Error = 'Communication error with Namecheap.';
+      $this->errorCode = -1;
       return FALSE;
     }
     $xml = new SimpleXMLElement($result);
