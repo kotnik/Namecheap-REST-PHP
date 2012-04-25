@@ -413,8 +413,12 @@ class Namecheap
     $this->Raw = $xml;
     $this->realTime =  microtime(TRUE) - $startTime;
     if ('ERROR' == $xml['Status']) {
-      $this->errorCode = -2;
       $this->Error = (string) $xml->Errors->Error;
+      if (isset($xml->Errors->Error['Number'])) {
+        $this->errorCode = (string) $xml->Errors->Error['Number'];
+      } else {
+        $this->errorCode = -2;
+      }
       return FALSE;
     } elseif ('OK' == $xml['Status']) {
       $this->Response = $xml->CommandResponse;
