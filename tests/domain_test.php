@@ -45,6 +45,8 @@ echo "Working with $domain.\t\t\t\t(t = 0.000s)\n";
 if (!$namecheap->domainsCheck($domain)) {
   if ($namecheap->errorCode == -1) {
     file_put_contents('php://stderr', "Namecheap API down.\n");
+  } else if ($namecheap->errorCode == -2) {
+    file_put_contents('php://stderr', "Error: " . $namecheap->Error . "\n");
   } else {
     file_put_contents('php://stderr', "$domain is already taken.\n");
   }
