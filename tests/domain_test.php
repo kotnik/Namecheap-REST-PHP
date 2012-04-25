@@ -139,7 +139,6 @@ if ($expiry_timestamp > time()) {
       exit(1);
     }
   } else {
-    echo "$domain expires in $days_left days.\t\t\t";
-    echo "(t = " . $time['RealTime'] . "s)\n";
+    echo "$domain expires in $days_left days.\n";
   }
 }
