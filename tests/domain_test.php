@@ -34,7 +34,7 @@ if ($domain == 'random') {
   $max = strlen($base) - 1;
   $domain = '';
   mt_srand(microtime(TRUE) * 1000000);
-  while (strlen($domain)<17) {
+  while (strlen($domain) < 17) {
     $domain .= $base{mt_rand(0, $max)};
   }
   $domain .= '.com';
