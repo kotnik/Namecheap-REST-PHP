@@ -129,7 +129,7 @@ $expiry_timestamp = mktime(
   $expiry_date['tm_hour'],
   $expiry_date['tm_min'],
   $expiry_date['tm_sec'],
-  1 ,
+  1,
   $expiry_date['tm_yday'] + 1,
   $expiry_date['tm_year'] + 1900
 );
