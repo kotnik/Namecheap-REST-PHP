@@ -18,6 +18,7 @@ class Namecheap
   public $Error;
   public $errorCode;
   public $Raw;
+  private $rawXML;
 
   /**
    * Factory method.
@@ -234,6 +235,91 @@ class Namecheap
   }
 
   /**
+   * Create SSL certificate.
+   *
+   * @type string
+   *   Type of SSL from providers supported by Namecheap.
+   * @promo string
+   *   Promotion (coupon) code, if available.
+   * @years int
+   *   Registration duration in years.
+   * @return mixed
+   *   Certificate information or boolean false on failure.
+   */
+  public function sslCreate($type = 'RapidSSL', $promo = '', $years = 1) {
+    $args = array('Type' => $type, 'Years' => $years);
+    if(!empty($promo)) {
+      $args['PromotionCode'] = $promo;
+    }
+    if ($this->execute('namecheap.ssl.create', $args)) {
+      if ('true' == strtolower($this->Response->SSLCreateResult->attributes()->IsSuccess)) {
+        return array(
+          'OrderId' => (string) $this->Response->SSLCreateResult['OrderId'],
+          'TransactionId' => (string) $this->Response->SSLCreateResult['TransactionId'],
+          'ChargedAmount' => (string) $this->Response->SSLCreateResult['ChargedAmount'],
+          'CertificateId' => (string) $this->Response->SSLCreateResult->SSLCertificate['CertificateID'],
+          'Created' => (string) $this->Response->SSLCreateResult->SSLCertificate['Created'],
+          'SSLType' => (string) $this->Response->SSLCreateResult->SSLCertificate['SSLType'],
+          'Years' => (string) $this->Response->SSLCreateResult->SSLCertificate['Years']
+        );
+      } else {
+        return FALSE;
+      }
+    } else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Activates SSL certificate.
+   *
+   * @data array
+   *   Associative array of required activation data:
+   *   http://developer.namecheap.com/docs/doku.php?id=api-reference:ssl:activate
+   * @return bool
+   *   Success of failure.
+   */
+  public function sslActivate($data) {
+    if (!$this->execute('namecheap.ssl.activate', $data, 'POST')) {
+      return FALSE;
+    }
+    if ('true' == strtolower($this->Response->SSLActivateResult->attributes()->IsSuccess)) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Gets approver email list for the requested domain.
+   *
+   * @domain string
+   *   Domain name.
+   * @type string
+   *   Certificate type.
+   * @group string
+   *   Possible mail group values: Domainemails, Genericemails or Manualemails.
+   * @return mixed
+   *   Array with emails or boolean false on failure.
+   */
+  public function sslGetApproverEmailList($domain, $type = 'RapidSSL', $group = 'all') {
+    $args = array('DomainName' => $domain, 'CertificateType' => $type);
+    if ($this->execute('namecheap.ssl.getApproverEmailList', $args)) {
+      $domain_mails = array();
+      $keys = $group == 'all' ? array('Domainemails', 'Genericemails', 'Manualemails') : $group;
+      foreach ($keys as $key) {
+        foreach ($this->Response->GetApproverEmailListResult->{$key} as $mails) {
+          foreach($mails as $mail) {
+            $domain_mails[] = (string) $mail;
+          }
+        }
+      }
+      return $domain_mails;
+    } else {
+      return FALSE;
+    }
+  }
+
+  /**
    * Assign nameservers to a domain.
    *
    * @domain string
@@ -360,7 +446,7 @@ class Namecheap
    * @return float
    *   Time needed for API call.
    */
-  function getExecutionTime() {
+  public function getExecutionTime() {
     $x = array(
       'ExecutionTime' => 0.0,
       'RealTime' => (float) sprintf('%.3f', $this->realTime),
@@ -378,15 +464,18 @@ class Namecheap
    *   The name of the API call to invoke.
    * @args array
    *   Associative array of options for the API call.
+   * @method string
+   *   REST method can be POST or GET.
    * @return bool
    *   Success or failure.
    */
-  private function execute($command, $args = array()) {
+  private function execute($command, $args = array(), $method = 'GET') {
     // blank out any previous values for these
     $this->Error = '';
     $this->errorCode = 0;
     $this->Response = '';
     $this->Raw = '';
+    $this->rawXML = '';
     $this->realTime = 0.0;
     $startTime = microtime(TRUE);
 
@@ -396,12 +485,26 @@ class Namecheap
       '&UserName=' . $this->api_user .
       '&ClientIP=' . $this->api_ip .
       '&Command=' . $command;
-    foreach ($args as $arg => $value) {
-      $url .= "&$arg=";
-      $url .= urlencode($value);
-    }
-    $ch = curl_init($url);
+
+    $ch = curl_init();
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+    if ($method == 'POST') {
+      $fields_string = '';
+      foreach($args as $key => $value) {
+        $fields_string .= $key . '=' . rawurlencode($value) . '&';
+      }
+      rtrim($fields_string, '&');
+      curl_setopt($ch, CURLOPT_POST, count($args));
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
+    } else {
+      foreach ($args as $arg => $value) {
+        $url .= "&$arg=";
+        $url .= urlencode($value);
+      }
+    }
+
+    curl_setopt($ch, CURLOPT_URL, $url);
     $result = curl_exec($ch);
     curl_close($ch);
     if (FALSE == $result) {
@@ -411,6 +514,7 @@ class Namecheap
     }
     $xml = new SimpleXMLElement($result);
     $this->Raw = $xml;
+    $this->rawXML = $result;
     $this->realTime =  microtime(TRUE) - $startTime;
     if ('ERROR' == $xml['Status']) {
       $this->Error = (string) $xml->Errors->Error;
