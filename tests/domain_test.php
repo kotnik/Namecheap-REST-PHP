@@ -4,42 +4,15 @@
 /**
  * @file
  *
- * Namecheap API test script that operates on Sandbox API.
+ * Namecheap API domain test script that operates on Sandbox API.
  *
  * Arguments required:
  *   - Namecheap API user
  *   - Namecheap API key
- *   - Domain to register (string 'random' for random domain)
+ *   - Domain to attach to SSL certificate to (string 'random' for random domain)
  */
 
-require_once('../namecheap.php');
-
-array_shift($argv);
-if (count($argv) != 3) {
-  file_put_contents('php://stderr', "Need ApiUser, ApiKey and DomainName parameters provided, respectively.\n");
-  exit(1);
-}
-
-// Get API class
-$namecheap_params = array(
-  'api_user' => $argv[0],
-  'api_key' => $argv[1]
-);
-$namecheap = Namecheap::init($namecheap_params, TRUE);
-
-// Generate random domain if needed
-$domain = $argv[2];
-if ($domain == 'random') {
-  $base = 'abcdefghjkmnpqrstwxyz';
-  $max = strlen($base) - 1;
-  $domain = '';
-  mt_srand(microtime(TRUE) * 1000000);
-  while (strlen($domain) < 17) {
-    $domain .= $base{mt_rand(0, $max)};
-  }
-  $domain .= '.com';
-}
-echo "Working with $domain.\t\t\t\t(t = 0.000s)\n";
+require_once('common.php');
 
 // Check if the domain is already registered
 if (!$namecheap->domainsCheck($domain)) {
@@ -56,51 +29,6 @@ if (!$namecheap->domainsCheck($domain)) {
   echo "$domain is available.\t\t\t\t";
   echo "(t = " . $time['RealTime'] . "s)\n";
 }
-
-// Register domain
-$domain_reg_data = array(
-  'Years' => '1',
-  'AuxBillingFirstName' => 'John',
-  'AuxBillingLastName' => 'Smith',
-  'AuxBillingAddress1' => '8939%20S.cross%20Blvd',
-  'AuxBillingStateProvince' => 'CA',
-  'AuxBillingPostalCode' => '90045',
-  'AuxBillingCountry' => 'US',
-  'AuxBillingPhone' => '+1.6613102107',
-  'AuxBillingEmailAddress' => 'namecheap@example.com',
-  'AuxBillingOrganizationName' => 'NC',
-  'AuxBillingCity' => 'CA',
-  'TechFirstName' => 'John',
-  'TechLastName' => 'Smith',
-  'TechAddress1' => '8939%20S.cross%20Blvd',
-  'TechStateProvince' => 'CA',
-  'TechPostalCode' => '90045',
-  'TechCountry' => 'US',
-  'TechPhone' => '+1.6613102107',
-  'TechEmailAddress' => 'namecheap@example.com',
-  'TechOrganizationName' => 'NC',
-  'TechCity' => 'CA',
-  'AdminFirstName' => 'John',
-  'AdminLastName' => 'Smith',
-  'AdminAddress1' => '8939%20S.cross%20Blvd',
-  'AdminStateProvince' => 'CA',
-  'AdminPostalCode' => '90045',
-  'AdminCountry' => 'US',
-  'AdminPhone' => '+1.6613102107',
-  'AdminEmailAddress' => 'namecheap@example.com',
-  'AdminOrganizationName' => 'NC',
-  'AdminCity' => 'CA',
-  'RegistrantFirstName' => 'John',
-  'RegistrantLastName' => 'Smith',
-  'RegistrantAddress1' => '8939%20S.cross%20Blvd',
-  'RegistrantStateProvince' => 'CS',
-  'RegistrantPostalCode' => '90045',
-  'RegistrantCountry' => 'US',
-  'RegistrantPhone' => '+1.6613102107',
-  'RegistrantEmailAddress' => 'namecheap@example.com',
-  'RegistrantOrganizationName' => 'NC',
-  'RegistrantCity' => 'CA',
-);
 
 if (!$namecheap->domainsCreate($domain, $domain_reg_data)) {
   file_put_contents('php://stderr', "$domain failed to register with error: " . $namecheap->Error . ".\n");
