@@ -49,6 +49,26 @@ $openssl_command = 'cd /tmp && openssl req -new -nodes -keyout myserver.key -new
 exec($openssl_command, $openssl_output);
 $csr = implode("\n", $openssl_output);
 
+// Wait in order to try to avoid "Missing or Invalid PartnerOrderID" error
+sleep(5);
+
+// Get certificate information
+if ($ssl_info = $namecheap->sslGetInfo($ssl['CertificateId'])) {
+  $time = $namecheap->getExecutionTime();
+  echo "SSL certificate ID #{$ssl['CertificateId']} info query.\t\t\t\t";
+  echo "(t = " . $time['RealTime'] . "s)\n";
+  echo "\nSSL info:\n";
+  print_r($ssl_info);
+  echo "\n";
+} else {
+  file_put_contents('php://stderr', "Failed to get SSL certificate info with error: " . $namecheap->Error . ".\n");
+  exit(1);
+}
+
+// Wait in order to try to avoid "Missing or Invalid PartnerOrderID" error
+sleep(5);
+
+
 // Get approver mail and use namecheap named one
 $mails = $namecheap->sslGetApproverEmailList($domain);
 $namecheap_mail = '';
@@ -69,6 +89,20 @@ if ($namecheap_mail) {
     $time = $namecheap->getExecutionTime();
     echo "SSL certificate ID #{$ssl['CertificateId']} activated.\t\t\t\t";
     echo "(t = " . $time['RealTime'] . "s)\n";
+
+    // Get certificate information after activation
+    sleep(5);
+    if ($ssl_info = $namecheap->sslGetInfo($ssl['CertificateId'])) {
+      $time = $namecheap->getExecutionTime();
+      echo "SSL certificate ID #{$ssl['CertificateId']} info query.\t\t\t\t";
+      echo "(t = " . $time['RealTime'] . "s)\n";
+      echo "\nSSL info:\n";
+      print_r($ssl_info);
+      echo "\n";
+    } else {
+      file_put_contents('php://stderr', "Failed to get SSL certificate info with error: " . $namecheap->Error . ".\n");
+      exit(1);
+    }
   } else {
     file_put_contents('php://stderr', "Failed to activate SSL certificate with error: " . $namecheap->Error . ".\n");
     exit(1);
