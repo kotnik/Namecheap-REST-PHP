@@ -9,8 +9,12 @@
 require_once('../namecheap.php');
 
 array_shift($argv);
-if (count($argv) != 3) {
-  file_put_contents('php://stderr', "Need ApiUser, ApiKey and DomainName parameters provided, respectively.\n");
+if (count($argv) < 3) {
+  if (!defined('NO_DOMAIN')) {
+    file_put_contents('php://stderr', "Need ApiUser, ApiKey and DomainName parameters provided, respectively.\n");
+  } else {
+    file_put_contents('php://stderr', "Need ApiUser, ApiKey and FundsTreshold parameters provided, respectively.\n");
+  }
   exit(1);
 }
 
@@ -21,19 +25,21 @@ $namecheap_params = array(
 );
 $namecheap = Namecheap::init($namecheap_params, TRUE);
 
-// Generate random domain if needed
 $domain = $argv[2];
-if ($domain == 'random') {
-  $base = 'abcdefghjkmnpqrstwxyz';
-  $max = strlen($base) - 1;
-  $domain = '';
-  mt_srand(microtime(TRUE) * 1000000);
-  while (strlen($domain) < 17) {
-    $domain .= $base{mt_rand(0, $max)};
+if (!defined('NO_DOMAIN')) {
+  // Generate random domain if needed
+  if ($domain == 'random') {
+    $base = 'abcdefghjkmnpqrstwxyz';
+    $max = strlen($base) - 1;
+    $domain = '';
+    mt_srand(microtime(TRUE) * 1000000);
+    while (strlen($domain) < 17) {
+      $domain .= $base{mt_rand(0, $max)};
+    }
+    $domain .= '.com';
   }
-  $domain .= '.com';
+  echo "Working with $domain.\t\t\t\t(t = 0.000s)\n";
 }
-echo "Working with $domain.\t\t\t\t(t = 0.000s)\n";
 
 // Domain registration data
 $domain_reg_data = array(
