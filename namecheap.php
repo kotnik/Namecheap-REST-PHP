@@ -290,6 +290,38 @@ class Namecheap
   }
 
   /**
+   * Query for SSL certificate info.
+   *
+   * @type int
+   *   Certificate ID.
+   * @return mixed
+   *   Certificate information or boolean false on failure.
+   */
+  public function sslGetInfo($certificateID = 0) {
+    if ($certificateID) {
+      if (!$this->execute('namecheap.ssl.getInfo', array('CertificateID' => $certificateID))) {
+        return FALSE;
+      }
+      return array(
+        'OrderId' => (string) $this->Response->SSLGetInfoResult->attributes()->OrderId,
+        'CertificateType' => (string) $this->Response->SSLGetInfoResult->attributes()->Type,
+        'Provider' => (string) $this->Response->SSLGetInfoResult->Provider->Name,
+        'ProviderOrderId' => (string) $this->Response->SSLGetInfoResult->Provider->OrderID,
+        'Status' => (string) $this->Response->SSLGetInfoResult->attributes()->Status,
+        'StatusDescription' => (string) $this->Response->SSLGetInfoResult->attributes()->StatusDescription,
+        'Issued' => (string) $this->Response->SSLGetInfoResult->attributes()->IssuedOn,
+        'Expires' => (string) $this->Response->SSLGetInfoResult->attributes()->Expires,
+        'ActivationExpire' => (string) $this->Response->SSLGetInfoResult->attributes()->ActivationExpireDate,
+        'CSR' => (string) $this->Response->SSLGetInfoResult->CertificateDetails->CSR,
+        'Domain' => (string) $this->Response->SSLGetInfoResult->CertificateDetails->CommonName,
+        'Approver' => (string) $this->Response->SSLGetInfoResult->CertificateDetails->ApproverEmail,
+      );
+    } else {
+      return FALSE;
+    }
+  }
+
+  /**
    * Gets approver email list for the requested domain.
    *
    * @domain string
