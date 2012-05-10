@@ -19,7 +19,8 @@ The raw response from the Namecheap API is available as a public variable "$Raw"
 
 ### Usage
 
-```php
+``` php
+<?php
 include_once('namecheap.php');
 $nc_api = array(
   'api_user' => 'username',
@@ -52,6 +53,7 @@ if ($nc) {
     print_r($nc->Error);
   }
 }
+
 ```
 
 ### License
